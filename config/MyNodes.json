@@ -1,0 +1,55 @@
+{
+	"metainfo":{
+		"nodes":[
+			{
+				"host":"tracker.btba.cc",
+				"port":6060
+			},
+			{
+				"host":"explodie.org",
+				"port":6969
+			},
+			{
+				"host":"mgtracker.org",
+				"port":2710
+			},
+			{
+				"host":"9.rarbg.com",
+				"port":2720
+			},
+			{
+				"host":"shadowshq.yi.org",
+				"port":6969
+			},
+			{
+				"host":"shadowshq.eddie4.nl",
+				"port":6969
+			},
+			{
+				"host":"tracker.coppersurfer.tk",
+				"port":6969
+			},
+			{
+				"host":"tracker2.wasabii.com.tw",
+				"port":6969
+			},
+			{
+				"host":"eddie4.nl",
+				"port":6969
+			},
+			{
+				"host":"tracker.opentrackr.org",
+				"port":1337
+			},
+			{
+				"host":"tracker.leechers-paradise.org",
+				"port":6969
+			}
+		],
+		"value":"hello world!"
+	},
+	"config":{
+		"bind" : "localhost",
+		"port" : 9999
+	}
+}
