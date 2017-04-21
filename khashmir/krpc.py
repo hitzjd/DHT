@@ -230,6 +230,7 @@ class KRPC(object):
         self.tids[msg[TID]] = d
         self.call_later(KRPC_TIMEOUT, self.timeOut, msg[TID])
         self.call_later(0, self._send, s, d)
+        # self._send(s,d)
         return d
 
     def timeOut(self, id):

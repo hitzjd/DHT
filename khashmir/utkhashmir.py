@@ -121,10 +121,9 @@ class UTKhashmir(khashmir.KhashmirBase):
 
     def addContact(self, host, port, callback=None):
         # use dns on host, then call khashmir.addContact
-        # Thread(target=self._get_host, args=[host, port, callback]).start()
-        t = Thread(target=self._get_host, args=[host, port, callback])
-        t.start()
-        t.join()
+        Thread(target=self._get_host, args=[host, port, callback]).start()
+        # t = Thread(target=self._get_host, args=[host, port, callback])
+        # t.start()
 
     def _get_host(self, host, port, callback):
 
@@ -135,8 +134,8 @@ class UTKhashmir(khashmir.KhashmirBase):
         except TypeError, e:
             raise TypeError(str(e) + (": host(%s) port(%s)" % (repr(host), repr(port))))
         
-        # self.rawserver.external_add_task(0, self._got_host, ip, port, callback)
-        self._got_host(ip,port,callback)
+        self.rawserver.external_add_task(0, self._got_host, ip, port, callback)
+        # self._got_host(ip,port,callback)
 
     def _got_host(self, host, port, callback):
         print '_got_host'

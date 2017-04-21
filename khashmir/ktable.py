@@ -45,7 +45,7 @@ class KTable(object):
             return K nodes in our own local table closest to the ID.
         """
 
-        print type(id)
+        print 'id:',type(id)
 
         if isinstance(id, str):
             num = hash.intify(id)

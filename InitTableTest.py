@@ -9,10 +9,8 @@ from BitTorrent.RawServer_twisted import RawServer
 from BTL import BTFailure, InfoHashType
 from BTL.bencode import bencode
 from BTL.hash import sha
+from twisted.internet import reactor
 from BTL.stackthreading import Thread
-
-reload(sys)
-sys.setdefaultencoding('utf8')
 
 
 class InitTableTest:
@@ -20,6 +18,7 @@ class InitTableTest:
 		self.config,self.metainfo = self._load_settings()
 		self.rawserver = RawServer(self.config)
 		self.dht = UTKhashmir(self.config['bind'],self.config['port'],'data',self.rawserver)
+
 
 	def _load_settings(self):
 		f = open('config/MyNodes.json')
@@ -40,8 +39,8 @@ class InitTableTest:
 					# df = self.rawserver.gethostbyname(host)
 					# print type(df)
 					# df.addCallback(self.dht.addContact,port)
-			
-			
+                # self.rawserver.listen_forever()
+                reactor.run()
 
 	def show_table(self):
 		for bucket in self.dht.table.buckets:

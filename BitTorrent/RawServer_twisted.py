@@ -610,7 +610,6 @@ class RawServer(RawServerMixin):
 
            This should be called by threads other than RawServer's thread."""
         if delay == 0:
-            print 'external_add_task:delay = 0'
             return reactor.callFromThread(_f, *args, **kwargs)
         else:
             return reactor.callFromThread(reactor.callLater, delay,
