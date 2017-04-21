@@ -19,6 +19,7 @@ from BTL.platform import bttime
 from BTL.translation import _
 import time
 from math import log10
+from client import client
 
 import sys
 from traceback import print_exc
@@ -53,11 +54,11 @@ class KRPCSelfNodeError(Exception):
 
 class hostbroker(Handler):       
     def __init__(self, server, addr, transport, call_later, max_ul_rate, config, rlcount):
-        self.server = server
-        self.addr = addr
-        self.transport = transport
+        self.server = server         #khashmirbase
+        self.addr = addr             #local address
+        self.transport = transport   #listening udp socket(addr)
         self.rltransport = KRateLimiter(transport, max_ul_rate, call_later, rlcount, config['max_rate_period'])
-        self.call_later = call_later
+        self.call_later = call_later  #rawserver.add_task
         self.connections = Cache(touch_on_access=True)
         self.hammerlock = Hammerlock(100, call_later)
         self.expire_connections(loop=True)
@@ -229,8 +230,8 @@ class KRPC(object):
         d = Deferred()
         self.tids[msg[TID]] = d
         self.call_later(KRPC_TIMEOUT, self.timeOut, msg[TID])
-        self.call_later(0, self._send, s, d)
-        # self._send(s,d)
+        # self.call_later(0, self._send, s, d)
+        client(s)
         return d
 
     def timeOut(self, id):

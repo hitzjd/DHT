@@ -201,6 +201,7 @@ class ConnectionWrapper(object):
     def sendto(self, packet, flags, addr):
         ret = None
         try:
+            print "sendto",addr
             ret = self.transport.write(packet, addr)
         except:
             rawserver_logger.warning("UDP sendto failed", exc_info=sys.exc_info())

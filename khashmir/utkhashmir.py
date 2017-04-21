@@ -138,7 +138,6 @@ class UTKhashmir(khashmir.KhashmirBase):
         # self._got_host(ip,port,callback)
 
     def _got_host(self, host, port, callback):
-        print '_got_host'
         khashmir.KhashmirBase.addContact(self, host, port, callback)
 
     def announcePeer(self, info_hash, port, callback=None):

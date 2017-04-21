@@ -152,7 +152,6 @@ class KhashmirBase:
         """
             ping this node and add the contact info to the table on pong!
         """
-        print 'khashmir::_addContact'
         n =self.Node().init(const.NULL_ID, host, port)
         try:
             self.sendPing(n, callback=callback)
@@ -167,7 +166,6 @@ class KhashmirBase:
         """
             ping this node and add the contact info to the table on pong!
         """
-        print 'khashmir::addContact'
         if ip_pat.match(ip):
             self._addContact(ip, port)
         else:
@@ -290,7 +288,6 @@ class KhashmirBase:
             ping a node
         """
         try:
-            print 'khashmir::sendPing'
             df = node.ping(self.node.id)
         except krpc.KRPCSelfNodeError:
             pass

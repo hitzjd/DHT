@@ -49,7 +49,7 @@
 		"value":"hello world!"
 	},
 	"config":{
-		"bind" : "127.0.0.1",
+		"bind" : "172.17.169.47",
 		"port" : 31111
 	}
 }
