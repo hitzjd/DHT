@@ -73,6 +73,7 @@ class hostbroker(Handler):
 
     def data_came_in(self, addr, datagram):
         #if addr != self.addr:
+        print "recvfrom ",addr
         if not self.config['pause'] and self.hammerlock.check(addr):
             c = self.connectionForAddr(addr)
             c.datagramReceived(datagram, addr)
@@ -113,6 +114,7 @@ class KRPC(object):
         self.rltransport.sendto(out, 0, addr)
         return olen                 
 
+    ''' analyse krpc packet '''
     def datagramReceived(self, str, addr):
         # bdecode
         try:
@@ -194,6 +196,7 @@ class KRPC(object):
             elif msg[TYP] == RSP:
                 # if response
                 # 	lookup tid
+                ''' use TID to get request'''
                 if self.tids.has_key(msg[TID]):
                     df = self.tids[msg[TID]]
                     # 	callback
@@ -230,10 +233,9 @@ class KRPC(object):
         d = Deferred()
         self.tids[msg[TID]] = d
         self.call_later(KRPC_TIMEOUT, self.timeOut, msg[TID])
-        # self.call_later(0, self._send, s, d)
-        client(s)
+        self.call_later(0, self._send, s, d)
         return d
-
+    #
     def timeOut(self, id):
         if self.tids.has_key(id):
             df = self.tids[id]

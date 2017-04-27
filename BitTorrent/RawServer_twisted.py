@@ -644,8 +644,8 @@ class RawServer(RawServerMixin):
         return s
 
     def _create_udpsocket(self, port, bind, create_func):
+        print "create_udp_socket(%s:%s)"%(bind,port)
         s = SocketRequestProxy(port, bind, 'udp')
-
         protocol = CallbackDatagramProtocol()
 
         c = ConnectionWrapper(self, Handler(), None)

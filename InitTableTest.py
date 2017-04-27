@@ -10,14 +10,13 @@ from BTL import BTFailure, InfoHashType
 from BTL.bencode import bencode
 from BTL.hash import sha
 from twisted.internet import reactor
-from BTL.stackthreading import Thread
 
 
 class InitTableTest:
 	def __init__(self):
 		self.config,self.metainfo = self._load_settings()
 		self.rawserver = RawServer(self.config)
-		self.dht = UTKhashmir(self.config['bind'],self.config['port'],'data',self.rawserver)
+		self.dht = UTKhashmir(self.config['bind'],self.config['port'],self.config['dumpDir'],self.rawserver)
 
 
 	def _load_settings(self):
@@ -40,16 +39,27 @@ class InitTableTest:
 					# print type(df)
 					# df.addCallback(self.dht.addContact,port)
                 # self.rawserver.listen_forever()
-                reactor.run()
+				self.rawserver.add_task(30,self.show_table)
+
+			self.dht.announcePeer(infohash,self.metainfo['value'].encode('ascii'))
+			ret = self.dht.getPeers(infohash,self.show_value)
+			print ret
+
+	def show_value(self,*arg):
+		print arg[0]
 
 	def show_table(self):
 		for bucket in self.dht.table.buckets:
-			print bucket
+			for node in bucket.l:
+				print node.host,node.port,node.num
+
+
 
 if __name__ == '__main__':
 	itt = InitTableTest()
 	itt.start_init()
 	itt.show_table()
+	reactor.run()
 
 
 

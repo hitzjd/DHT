@@ -130,7 +130,6 @@ class UTKhashmir(khashmir.KhashmirBase):
         # this exception catch can go away once we actually fix the bug
         try:
             ip = gethostbyname(host)
-            print '%s : %s'%(host,ip)
         except TypeError, e:
             raise TypeError(str(e) + (": host(%s) port(%s)" % (repr(host), repr(port))))
         
