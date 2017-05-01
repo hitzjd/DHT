@@ -86,7 +86,6 @@ class Node(object):
             a = a.num
         return self.num != a
 
-
 import unittest
 
 class TestNode(unittest.TestCase):

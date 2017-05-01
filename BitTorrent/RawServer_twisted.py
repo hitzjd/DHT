@@ -596,13 +596,13 @@ class RawServer(RawServerMixin):
         addrs = [(s.ip, s.port) for s in self.single_sockets]
         return addrs
 
-##    def add_task(self, delay, _f, *args, **kwargs):
+##    def add_task##        return reactor.callLater(delay, _f, *args, **kwargs)(self, delay, _f, *args, **kwargs):
 ##        """Schedule the passed function 'func' to be called after
 ##           'delay' seconds and pass the 'args'.
 ##
 ##           This should only be called by RawServer's thread."""
 ##        #assert thread.get_ident() == self.ident
-##        return reactor.callLater(delay, _f, *args, **kwargs)
+
     add_task = reactor.callLater
 
     def external_add_task(self, delay, _f, *args, **kwargs):

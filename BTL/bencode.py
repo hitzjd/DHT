@@ -107,6 +107,7 @@ def encode_dict(x,r):
     ilist.sort()
     for k, v in ilist:
         r.extend((str(len(k)), ':', k))
+        # print type(v)
         encode_func[type(v)](v, r)
     r.append('e')
 

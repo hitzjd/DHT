@@ -25,15 +25,20 @@ class NodeWrap(object):
     def __init__(self, node, target):
         self.target = target
         self.node = node
+        '''add by zjd at 2017/05/01'''
+        self.num = self.node.num
 
     def __cmp__(self, o):
         """ this function is for sorting nodes relative to the ID we are looking for """
-        y, x = self.target ^ o.node.num, self.target ^ self.node.num
+        y, x = self.target ^ o.num, self.target ^ self.num
+        # y, x = self.target ^ o.node.num, self.target ^ self.node.num
         if x > y:
             return 1
         elif x < y:
             return -1
         return 0
+
+
         
 class ActionBase(object):
     """ base class for some long running asynchronous proccesses like finding nodes or values """
@@ -304,7 +309,8 @@ class StoreValue(ActionBase):
             self.callback(self.stored)
         while num > 0:
             try:
-                node = self.nodes.pop()
+                '''add by zjd at 2017/05/02'''
+                node = self.nodes.pop().node
             except IndexError:
                 if self.outstanding == 0:
                     self.finished = 1
@@ -329,6 +335,7 @@ class StoreValue(ActionBase):
                             df.addErrback(self.storeFailed, node=node)
                             self.outstanding += 1
                             num -= 1
+
                         
     def goWithNodes(self, nodes):
         self.nodes = nodes

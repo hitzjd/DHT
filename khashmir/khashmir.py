@@ -95,7 +95,7 @@ class KhashmirBase:
     def _load(self):
         do_load = False
         try:
-            s = open(os.path.join(self.ddir, "routing_table"), 'r').read()
+            s = open(os.path.join(self.ddir, "routing_table"), 'rb').read()
             dict = bdecode(s)
         except:
             id = newID()

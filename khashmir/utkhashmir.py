@@ -28,7 +28,7 @@ NUM_PEERS = 50 # number of peers to return
 
 class UTNode(knode.KNodeBase):
     def announcePeer(self, info_hash, port, khashmir_id):
-        assert type(port) == type(1)
+        assert type(port) == type('')
         assert type(info_hash) == type('')
         assert type(khashmir_id) == type('')
         assert len(info_hash) == 20
@@ -154,6 +154,7 @@ class UTKhashmir(khashmir.KhashmirBase):
             self.rawserver.external_add_task(0, action.goWithNodes, nodes)
             
         # this call is asynch
+        print "announcePeer"
         self.findNode(info_hash, _storeValueForKey)
                     
     def krpc_announce_peer(self, info_hash, port, id, token, _krpc_sender):
@@ -180,6 +181,7 @@ class UTKhashmir(khashmir.KhashmirBase):
             callback will be called with a list of values for each peer that returns unique values
             final callback will be an empty list - probably should change to 'more coming' arg
         """
+        print "getPeers"
         nodes = self.table.findNodes(info_hash, invalid=True)
         l = [x for x in nodes if x.invalid]
         if len(l) > 4:

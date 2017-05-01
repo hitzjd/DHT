@@ -10,6 +10,7 @@ from BTL import BTFailure, InfoHashType
 from BTL.bencode import bencode
 from BTL.hash import sha
 from twisted.internet import reactor
+from khashmir import khash
 
 
 class InitTableTest:
@@ -27,8 +28,8 @@ class InitTableTest:
 
 	def start_init(self):
 		if self.dht:
-			infohash = InfoHashType(sha(bencode(self.metainfo['value'].encode('ascii'))).digest())
-			nodes = self.dht.table.findNodes(infohash,invalid=False)
+			infohash = sha(bencode(self.metainfo['value'].encode('ascii'))).digest()
+			nodes = self.dht.table.findNodes(infohash)
 			
 			if len(nodes) < const.K:
 				for node in self.metainfo['nodes']:
@@ -39,13 +40,13 @@ class InitTableTest:
 					# print type(df)
 					# df.addCallback(self.dht.addContact,port)
                 # self.rawserver.listen_forever()
-				self.rawserver.add_task(30,self.show_table)
+			self.rawserver.add_task(10,self.show_table)
 
-			self.dht.announcePeer(infohash,self.metainfo['value'].encode('ascii'))
-			ret = self.dht.getPeers(infohash,self.show_value)
-			print ret
+			self.rawserver.add_task(10,self.dht.announcePeer,infohash,self.metainfo['value'].encode('ascii'))
+			# self.rawserver.add_task(20,self.dht.getPeers,infohash,self.show_value)
 
 	def show_value(self,*arg):
+		print "here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 		print arg[0]
 
 	def show_table(self):
@@ -58,7 +59,6 @@ class InitTableTest:
 if __name__ == '__main__':
 	itt = InitTableTest()
 	itt.start_init()
-	itt.show_table()
 	reactor.run()
 
 
