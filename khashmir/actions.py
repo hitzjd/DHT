@@ -309,8 +309,7 @@ class StoreValue(ActionBase):
             self.callback(self.stored)
         while num > 0:
             try:
-                '''add by zjd at 2017/05/02'''
-                node = self.nodes.pop().node
+                node = self.nodes.pop()
             except IndexError:
                 if self.outstanding == 0:
                     self.finished = 1
@@ -325,6 +324,7 @@ class StoreValue(ActionBase):
                         print ">>> %s doesn't have a %s method!" % (node, self.store)
                     else:
                         try:
+                            '''f == UTNode::announcePeer'''
                             df = f(self.target, self.value, self.table.node.id)
                         except KRPCProtocolError:
                             self.table.table.invalidateNode(node)

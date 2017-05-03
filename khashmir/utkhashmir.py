@@ -28,7 +28,7 @@ NUM_PEERS = 50 # number of peers to return
 
 class UTNode(knode.KNodeBase):
     def announcePeer(self, info_hash, port, khashmir_id):
-        assert type(port) == type('')
+        assert type(port) == type(1)
         assert type(info_hash) == type('')
         assert type(khashmir_id) == type('')
         assert len(info_hash) == 20
@@ -51,7 +51,9 @@ class UTNode(knode.KNodeBase):
         df.addErrback(self.errBack)
         df.addCallback(self.checkSender)
         return df
-    
+
+
+
     def getPeers(self, info_hash, khashmir_id):
         df = self.conn().sendRequest('get_peers', {'info_hash':info_hash, 'id':khashmir_id})
         df.addErrback(self.errBack)
@@ -61,10 +63,12 @@ class UTNode(knode.KNodeBase):
     def checkSender(self, dict):
         d = knode.KNodeBase.checkSender(self, dict)
         try:
+            '''get_peer respond has token'''
             token = d['rsp']['token']
             assert type(token) == type(""), repr(token)
             # not true
             #assert len(token) == 20, repr(token)
+            '''tcache:{queried_id : queried_return_token}'''
             self.table.tcache[d['rsp']['id']] = token
         except KeyError:
             pass
@@ -77,13 +81,23 @@ class UTStoreValue(StoreValue):
 class UTKhashmir(khashmir.KhashmirBase):
     _Node = UTNode
 
+    '''Just  a  Test'''
+    def query(self,info_hash,host,port):
+        n = self._Node(self.udp.connectionForAddr)
+        n.table = self
+        n = n.init(const.NULL_ID, host, port)
+        df = n.conn().sendRequest('get_peers', {'info_hash':info_hash, 'id':self.table.node.id})
+        df.addErrback(n.errBack)
+        df.addCallback(n.checkSender)
+
     def setup(self, host, port, data_dir, rlcount, checkpoint=True):
         khashmir.KhashmirBase.setup(self, host, port,data_dir, rlcount, checkpoint)
         self.cur_token = self.last_token = sha('')
         self.tcache = Cache()
         self.gen_token(loop=True)
         self.expire_cached_tokens(loop=True)
-        
+
+    '''expire tokens in tcache'''
     def expire_cached_tokens(self, loop=False):
         self.tcache.expire(time() - TOKEN_UPDATE_INTERVAL)
         if loop:
@@ -97,13 +111,14 @@ class UTKhashmir(khashmir.KhashmirBase):
             self.rawserver.external_add_task(TOKEN_UPDATE_INTERVAL,
                                              self.gen_token, True)
 
+    '''create token'''
     def get_token(self, host, port):
         x = self.cur_token.copy()
         x.update("%s%s" % (host, port))
         h = x.digest()
         return h
 
-        
+    '''check token is valid or not'''
     def val_token(self, token, host, port):
         x = self.cur_token.copy()
         x.update("%s%s" % (host, port))
@@ -139,6 +154,8 @@ class UTKhashmir(khashmir.KhashmirBase):
     def _got_host(self, host, port, callback):
         khashmir.KhashmirBase.addContact(self, host, port, callback)
 
+    '''send krpc::find_node first  return nodes closest to inohash'''
+    '''then send krpc::announce_peer'''
     def announcePeer(self, info_hash, port, callback=None):
         """ stores the value for key in the global table, returns immediately, no status 
             in this implementation, peers respond but don't indicate status to storing values
@@ -151,12 +168,16 @@ class UTKhashmir(khashmir.KhashmirBase):
                     pass
                 response=_storedValueHandler
             action = UTStoreValue(self, key, value, response, self.rawserver.add_task, "announcePeer")
+            '''nodes is a list of NodeWraps'''
+            nodes = [node.node for node in nodes]
+            '''now nodes is a list of UTNode'''
             self.rawserver.external_add_task(0, action.goWithNodes, nodes)
             
         # this call is asynch
         print "announcePeer"
         self.findNode(info_hash, _storeValueForKey)
-                    
+
+    '''call when receive announce_peer krpc request'''
     def krpc_announce_peer(self, info_hash, port, id, token, _krpc_sender):
         sender = {'id' : id}
         sender['host'] = _krpc_sender[0]
@@ -169,6 +190,9 @@ class UTKhashmir(khashmir.KhashmirBase):
         self.insertNode(n, contacted=0)
         return {"id" : self.node.id}
 
+    '''find infohash in self.store(KStore)'''
+    """if find return store[infohash]"""
+    """if not find return []"""
     def retrieveValues(self, key):
         try:
             l = self.store.sample(key, NUM_PEERS)
@@ -218,6 +242,7 @@ class UTKhashmir(khashmir.KhashmirBase):
         state = GetAndStore(self, info_hash, port, callback, x, self.rawserver.add_task, 'getPeers', "announcePeer")
         self.rawserver.external_add_task(0, state.goWithNodes, nodes, l)
 
+    '''call when receive get_peer krpc request'''
     def krpc_get_peers(self, info_hash, id, _krpc_sender):
         sender = {'id' : id}
         sender['host'] = _krpc_sender[0]

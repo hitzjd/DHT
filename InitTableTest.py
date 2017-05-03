@@ -28,7 +28,7 @@ class InitTableTest:
 
 	def start_init(self):
 		if self.dht:
-			infohash = sha(bencode(self.metainfo['value'].encode('ascii'))).digest()
+			infohash = sha(bencode(self.metainfo['value'])).digest()
 			nodes = self.dht.table.findNodes(infohash)
 			
 			if len(nodes) < const.K:
@@ -36,14 +36,13 @@ class InitTableTest:
 					host = node['host']
 					port = node['port']
 					self.dht.addContact(host,port)
-					# df = self.rawserver.gethostbyname(host)
-					# print type(df)
-					# df.addCallback(self.dht.addContact,port)
-                # self.rawserver.listen_forever()
-			self.rawserver.add_task(10,self.show_table)
 
-			self.rawserver.add_task(10,self.dht.announcePeer,infohash,self.metainfo['value'].encode('ascii'))
-			# self.rawserver.add_task(20,self.dht.getPeers,infohash,self.show_value)
+			# self.rawserver.add_task(10,self.show_table)
+			self.rawserver.add_task(20, self.dht.getPeersAndAnnounce, infohash, self.metainfo['value'], self.show_value)
+			# self.rawserver.add_task(10, self.dht.query,infohash,'176.31.225.184',8999)
+
+			# self.rawserver.add_task(20,self.dht.announcePeer,infohash,self.metainfo['value'])
+			# self.rawserver.add_task(10,self.dht.getPeers,infohash,self.show_value)
 
 	def show_value(self,*arg):
 		print "here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"

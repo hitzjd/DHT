@@ -98,11 +98,11 @@ class KRPC(object):
     __slots__ = ('noisy','call_later','transport','rltransport','factory','addr','tids','mtid','pinging')
     noisy = 0
     def __init__(self, addr, server, transport, rltransport, call_later):
-        self.call_later = call_later
-        self.transport = transport
+        self.call_later = call_later      #rawserver.add_task
+        self.transport = transport        #udp socket
         self.rltransport = rltransport        
-        self.factory = server
-        self.addr = addr
+        self.factory = server             #UTKhashmirbase
+        self.addr = addr                  #dst addr(ip,port)
         self.tids = {}
         self.mtid = 0
         self.pinging = False
@@ -130,6 +130,7 @@ class KRPC(object):
                 ilen = len(str)
                 # if request
                 #	tell factory to handle
+                '''here to call krpc_xxx in UTkhashmirBase'''
                 f = getattr(self.factory ,"krpc_" + msg[REQ], None)
                 msg[ARG]['_krpc_sender'] =  self.addr
                 if f and callable(f):
