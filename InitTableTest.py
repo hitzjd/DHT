@@ -6,9 +6,6 @@ import json
 from khashmir.utkhashmir import UTKhashmir
 from khashmir import const
 from BitTorrent.RawServer_twisted import RawServer
-from BTL import BTFailure, InfoHashType
-from BTL.bencode import bencode
-from BTL.hash import sha
 from twisted.internet import reactor
 from khashmir import khash
 
@@ -28,21 +25,25 @@ class InitTableTest:
 
 	def start_init(self):
 		if self.dht:
-			infohash = sha(bencode(self.metainfo['value'])).digest()
+			# infohash = sha(bencode(self.metainfo['value'])).digest()
+			infohash = 0x0d0d7a9ef71434d31b893cec305264579b7cf262
 			nodes = self.dht.table.findNodes(infohash)
-			
+
 			if len(nodes) < const.K:
 				for node in self.metainfo['nodes']:
 					host = node['host']
 					port = node['port']
 					self.dht.addContact(host,port)
 
-			# self.rawserver.add_task(10,self.show_table)
-			self.rawserver.add_task(20, self.dht.getPeersAndAnnounce, infohash, self.metainfo['value'], self.show_value)
-			# self.rawserver.add_task(10, self.dht.query,infohash,'176.31.225.184',8999)
+
+			# self.rawserver.add_task(30,self.show_table)
+			# self.rawserver.add_task(20, self.dht.getPeersAndAnnounce, infohash, self.metainfo['value'], self.show_value)
+			# self.rawserver.add_task(10, self.dht.getPeerQuery,infohash,'176.31.225.184',8999)
 
 			# self.rawserver.add_task(20,self.dht.announcePeer,infohash,self.metainfo['value'])
-			# self.rawserver.add_task(10,self.dht.getPeers,infohash,self.show_value)
+
+			self.rawserver.add_task(10,self.dht.getPeers,khash.stringify(infohash),self.show_value)
+
 
 	def show_value(self,*arg):
 		print "here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"

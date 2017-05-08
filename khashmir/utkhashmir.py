@@ -82,13 +82,17 @@ class UTKhashmir(khashmir.KhashmirBase):
     _Node = UTNode
 
     '''Just  a  Test'''
-    def query(self,info_hash,host,port):
+    def getPeerQuery(self,info_hash,host,port):
         n = self._Node(self.udp.connectionForAddr)
         n.table = self
         n = n.init(const.NULL_ID, host, port)
         df = n.conn().sendRequest('get_peers', {'info_hash':info_hash, 'id':self.table.node.id})
-        df.addErrback(n.errBack)
-        df.addCallback(n.checkSender)
+        def myErrorBack(*arg):
+            print "error"
+        def mySuccessBack(*arg):
+            print "getPeer"
+        df.addErrback(myErrorBack)
+        df.addCallback(mySuccessBack)
 
     def setup(self, host, port, data_dir, rlcount, checkpoint=True):
         khashmir.KhashmirBase.setup(self, host, port,data_dir, rlcount, checkpoint)

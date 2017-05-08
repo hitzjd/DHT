@@ -193,7 +193,18 @@ class GetValue(FindNode):
         
         # go through nodes
         # if we have any closer than what we already got, query them
-        if dict.has_key('nodes'):
+        if dict.has_key('values'):
+            def x(y, z=self.results):
+                if not z.has_key(y):
+                    z[y] = 1
+                    return y
+                else:
+                    return None
+            z = len(dict.get('values', []))
+            v = filter(None, map(x, dict.get('values',[])))
+            if(len(v)):
+                self.callLater(0, self.callback, v)
+        elif dict.has_key('nodes'):
             try:
                 l = unpackNodes(dict.get('nodes',[]))
             except:
@@ -207,17 +218,6 @@ class GetValue(FindNode):
                     self.table.insertNode(n)
                     self.found[n.id] = n
                     insort(self.foundq, NodeWrap(n, self.num))
-        elif dict.has_key('values'):
-            def x(y, z=self.results):
-                if not z.has_key(y):
-                    z[y] = 1
-                    return y
-                else:
-                    return None
-            z = len(dict.get('values', []))
-            v = filter(None, map(x, dict.get('values',[])))
-            if(len(v)):
-                self.callLater(0, self.callback, v)
 
         if answered:
             self.answered[sender.id] = sender
@@ -237,6 +237,7 @@ class GetValue(FindNode):
                     break
                 #xxx t.timeout = time.time() + GET_VALUE_TIMEOUT
                 try:
+                    '''f == UTNode::GetPeers'''
                     f = getattr(node, self.findValue)
                 except AttributeError:
                     print ">>> findValue %s doesn't have a %s method!" % (node, self.findValue)
