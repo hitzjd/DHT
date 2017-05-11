@@ -71,10 +71,12 @@ class hostbroker(Handler):
         if loop:
             self.call_later(KRPC_CONNECTION_CACHE_TIME, self.expire_connections, True)
 
+    '''receive data'''
     def data_came_in(self, addr, datagram):
         #if addr != self.addr:
-        print "recvfrom ",addr
+        # print "recvfrom ",addr
         if not self.config['pause'] and self.hammerlock.check(addr):
+            '''c == RRPC instance'''
             c = self.connectionForAddr(addr)
             c.datagramReceived(datagram, addr)
 

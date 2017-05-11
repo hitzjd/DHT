@@ -244,7 +244,9 @@ class GetValue(FindNode):
                 else:
                     try:
                         df = f(self.target, self.table.node.id)
+                        '''got response'''
                         df.addCallback(self.handleGotNodes)
+                        '''call findNode if time out'''
                         df.addErrback(self.makeMsgFailed(node))
                         self.outstanding = self.outstanding + 1
                         self.queried[node.id] = 1

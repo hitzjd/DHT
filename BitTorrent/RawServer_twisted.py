@@ -198,10 +198,11 @@ class ConnectionWrapper(object):
             except socket.error:
                 pass
 
+    '''send udp packet'''
     def sendto(self, packet, flags, addr):
         ret = None
         try:
-            print "sendto",addr
+            # print "sendto",addr
             ret = self.transport.write(packet, addr)
         except:
             rawserver_logger.warning("UDP sendto failed", exc_info=sys.exc_info())
@@ -325,6 +326,8 @@ class CallbackConnection(object):
         s.rawserver._make_wrapped_call(s.handler.data_came_in,
                                        s, data, wrapper=s)
 
+    '''receive udp packet'''
+    '''s.handler == hostbroker'''
     def datagramReceived(self, data, (host, port)):
         s = self.connection
         s.rawserver._make_wrapped_call(s.handler.data_came_in,

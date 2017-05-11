@@ -1,8 +1,10 @@
 # *-* coding : utf-8 *-*
 
-import os
-import sys
 import json
+import socket
+import struct
+from sha import sha
+from BTL.bencode import bencode
 from khashmir.utkhashmir import UTKhashmir
 from khashmir import const
 from BitTorrent.RawServer_twisted import RawServer
@@ -25,8 +27,8 @@ class InitTableTest:
 
 	def start_init(self):
 		if self.dht:
-			# infohash = sha(bencode(self.metainfo['value'])).digest()
-			infohash = 0x0d0d7a9ef71434d31b893cec305264579b7cf262
+			infohash = sha(bencode(self.metainfo['value'])).digest()
+			# infohash = 0x0d0d7a9ef71434d31b893cec305264579b7cf262
 			nodes = self.dht.table.findNodes(infohash)
 
 			if len(nodes) < const.K:
@@ -37,17 +39,29 @@ class InitTableTest:
 
 
 			# self.rawserver.add_task(30,self.show_table)
-			# self.rawserver.add_task(20, self.dht.getPeersAndAnnounce, infohash, self.metainfo['value'], self.show_value)
+			self.rawserver.add_task(10, self.dht.getPeersAndAnnounce, infohash, self.metainfo['value'], self.show_value)
+			# self.rawserver.add_task(10, self.dht.pingQuery, '207.134.242.20', 59464)
 			# self.rawserver.add_task(10, self.dht.getPeerQuery,infohash,'176.31.225.184',8999)
 
 			# self.rawserver.add_task(20,self.dht.announcePeer,infohash,self.metainfo['value'])
 
-			self.rawserver.add_task(10,self.dht.getPeers,khash.stringify(infohash),self.show_value)
+			# self.rawserver.add_task(10,self.dht.getPeers,infohash,self.show_value)
 
 
 	def show_value(self,*arg):
 		print "here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-		print arg[0]
+		try:
+			result = arg[0][0]
+			# print len(result)
+			# ip_hex = result[:4]
+			ip_int = struct.unpack(">L",result[:4])[0]
+			ip = socket.inet_ntoa(struct.pack('L',socket.htonl(ip_int)))
+			port = struct.unpack(">H",result[4:])[0]
+			print "ip:port",ip,port
+		except IndexError:
+			print "not found"
+
+
 
 	def show_table(self):
 		for bucket in self.dht.table.buckets:

@@ -94,6 +94,11 @@ class UTKhashmir(khashmir.KhashmirBase):
         df.addErrback(myErrorBack)
         df.addCallback(mySuccessBack)
 
+    def pingQuery(self,host,port):
+        n = self.Node().init(const.NULL_ID, host, port)
+        self.sendPing(n)
+
+
     def setup(self, host, port, data_dir, rlcount, checkpoint=True):
         khashmir.KhashmirBase.setup(self, host, port,data_dir, rlcount, checkpoint)
         self.cur_token = self.last_token = sha('')
