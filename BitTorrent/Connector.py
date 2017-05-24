@@ -272,6 +272,7 @@ class Connector(Handler):
             if self.id is not None:
                 self.connection.write(self.parent.my_id)
 
+    '''parent is ConnectionManager'''
     def set_parent(self, parent):
         self.parent = parent
         self.max_message_length = self.parent.config['max_message_length']

@@ -296,14 +296,16 @@ class ConnectionWrapper(object):
 
 
 class CallbackConnection(object):
-
+    '''s == DatagramProtocol.connection == instance of ConnectionWrapper'''
     def attachTransport(self, transport, s):
         s.attach_transport(self, transport=transport,
                            reset_timeout=self.optionalResetTimeout)
         self.connection = s
 
+    '''called after tcp connection established'''
     def connectionMade(self):
         s = self.connection
+        '''call GaurdedInitialConnection::connection_made'''
         s.handler.connection_made(s)
         self.optionalResetTimeout()
 

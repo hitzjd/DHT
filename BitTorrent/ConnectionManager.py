@@ -71,7 +71,7 @@ class GaurdedInitialConnection(Handler):
         self.urgent = urgent
         self.timeout = timeout
         self.encrypt = encrypt
-        self.connector = None
+        self.connector = None     #ConnectionWrapper
         self.log_prefix = log_prefix
 
     def _make_connector(self, s):
@@ -95,7 +95,8 @@ class GaurdedInitialConnection(Handler):
         if self.t and self.t.active():
             self.t.cancel()
         self.t = None        
-        
+
+    '''create a peer-connection over tcp-connection'''
     def connection_made(self, s):
         t = bttime() - self.start
         set_timeout_metrics(t)
@@ -108,7 +109,7 @@ class GaurdedInitialConnection(Handler):
         del self.parent.pending_connections[addr]
 
         self._abort_timeout()        
-
+        '''con is a Connector which is a peer-connection'''
         con = self._make_connector(s)
         self.parent._add_connection(con)
             
@@ -286,6 +287,7 @@ class ConnectionManager(InternetSubscriber):
                 return
         self.cached_peers[addr] = (complete, (pid, handler, a, kw))
 
+    '''send to all peers 'keepalive' message'''
     def send_keepalives(self):
         self._ka_task = self.add_task(self.config['keepalive_interval'],
                                       self.send_keepalives)
@@ -302,6 +304,7 @@ class ConnectionManager(InternetSubscriber):
         for c in self.complete_connectors:
             c.send_pex(pex_set)
 
+    '''after download and checked, tell other peers had this piece '''
     def hashcheck_succeeded(self, i):
         for c in self.complete_connectors:
             # should we send a have message if peer already has the piece?
@@ -344,12 +347,15 @@ class ConnectionManager(InternetSubscriber):
            @param pid: peer id.
            """
         if self.closed:
-            return True 
+            return True
+        '''addr is (ip,port)'''
         if addr[0] in self.banned:
             return True
+        '''when peer is self, dont connect'''
         if pid == self.my_id:
             return True
 
+        '''v : instance of Connector'''
         for v in self.connectors:
             if pid and v.id == pid:
                 return True
@@ -392,6 +398,8 @@ class ConnectionManager(InternetSubscriber):
         h = handler(self, pid, *a, **kw)
         self.pending_connections[addr] = (h, (addr, pid, handler, a, kw))
         urgent = kw.pop('urgent', False)
+        '''connector is a instance of ConnectionWrapper'''
+        '''ConnectionWrapper.connector is reactor.connectTCP()'''
         connector = self.rawserver.start_connection(addr, h, self.context,
                                                     # we'll handle timeouts.
                                                     # not so fond of this.

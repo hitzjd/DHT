@@ -224,6 +224,8 @@ class Rerequester(object):
             self.previous_up = up()
             self.previous_down = down()
             return
+
+        '''download finished'''
         if self.finish:
             self.finish = False
             self._announce('completed')
@@ -359,6 +361,7 @@ class Rerequester(object):
         return (_("Problem connecting to tracker (%s): %s") %
                 (url, msg))
 
+    '''data is {'peers' : peer-list } when called by DHTRerequester::_got_peers'''
     def _postrequest(self, data=None, failure=None):
         #self.errorfunc(logging.INFO, 'postrequest(%s): %s d:%s f:%s' %
         #               (self.__class__.__name__, self.current_started,
@@ -409,12 +412,16 @@ class Rerequester(object):
             self.config['rerequest_interval'] = r['min interval']
         self.trackerid = r.get('tracker id', self.trackerid)
         self.last = r.get('last')
+
+        '''p is peer-list'''
         p = r['peers']
         peers = {}
         if isinstance(p, str):
+            '''p is a string'''
             for (ip, port) in IPTools.uncompact_sequence(p):
                 peers[(ip, port)] = None
         else:
+            '''p is [{'ip':'', 'port':..., 'peer id':''},...]'''
             for x in p:
                 peers[(x['ip'], x['port'])] = x.get('peer id')
         ps = len(peers) + self.howmany()
@@ -429,6 +436,9 @@ class Rerequester(object):
         if self.config['log_tracker_info']:
             self.errorfunc(logging.INFO, '%s tracker response: %d peers' %
                            (self.__class__.__name__, len(peers)))
+
+        '''connect to peers in peer-list'''
+        '''self.connect == ConnectionManager::start_connection'''
         for addr, pid in peers.iteritems():
             self.connect(addr, pid)
         if self.peerid == self.wanted_peerid:
@@ -466,6 +476,8 @@ class DHTRerequester(Rerequester):
         except Exception, e:
             self._postrequest(failure=Failure())
 
+    '''when received get_peer response contain 'value' '''
+    '''peers is the peer-list'''
     def _got_peers(self, peers):
         if not self.howmany:
             return

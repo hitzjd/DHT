@@ -377,7 +377,6 @@ class Torrent(object):
 
     # this function is so nasty!
     def _initialize(self):
-
         self._doneflag = threading.Event()
 
         # only one torrent object for of a particular infohash at a time.
@@ -588,6 +587,7 @@ class Torrent(object):
                 return
             else:
                 if self._dht:
+                    '''find closest nodes to infohash from route table'''
                     nodes = self._dht.table.findNodes(self.metainfo.infohash,
                                                       invalid=False)
                     if len(nodes) < const.K:
@@ -633,7 +633,9 @@ class Torrent(object):
 
         self._announced = True
         if self._dht and len(self._dht.table.findNodes(self.infohash)) == 0:
+            '''find closest nodes to self'''
             self.add_task(5, self._dht.findCloseNodes)
+        '''call _dht_rerequest.begin() here'''
         self._rerequest_op().begin()
 
         for url_prefix in self.metainfo.url_list:

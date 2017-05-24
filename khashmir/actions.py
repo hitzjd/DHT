@@ -322,6 +322,7 @@ class StoreValue(ActionBase):
             else:
                 if not node.id == self.table.node.id:
                     try:
+                        '''f == UTNode::announcePeer'''
                         f = getattr(node, self.store)
                     except AttributeError:
                         print ">>> %s doesn't have a %s method!" % (node, self.store)

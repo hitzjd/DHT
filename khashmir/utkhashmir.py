@@ -120,7 +120,7 @@ class UTKhashmir(khashmir.KhashmirBase):
             self.rawserver.external_add_task(TOKEN_UPDATE_INTERVAL,
                                              self.gen_token, True)
 
-    '''create token'''
+    '''create token called by queried nodes'''
     def get_token(self, host, port):
         x = self.cur_token.copy()
         x.update("%s%s" % (host, port))
@@ -163,7 +163,7 @@ class UTKhashmir(khashmir.KhashmirBase):
     def _got_host(self, host, port, callback):
         khashmir.KhashmirBase.addContact(self, host, port, callback)
 
-    '''send krpc::find_node first  return nodes closest to inohash'''
+    '''send krpc::find_node first  return nodes closest to infohash'''
     '''then send krpc::announce_peer'''
     def announcePeer(self, info_hash, port, callback=None):
         """ stores the value for key in the global table, returns immediately, no status 
