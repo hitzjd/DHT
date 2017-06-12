@@ -36,6 +36,7 @@ class Bitfield:
             if extra:
                 if len(bitstring) != rlen + 1:
                     raise ValueError("%s != %s" % (len(bitstring), rlen + 1))
+                '''last Byte : 11100000, when extra = 3'''
                 if (ord(bitstring[-1]) << extra) & 0xFF != 0:
                     raise ValueError("%s != %s" %
                                      ((ord(bitstring[-1]) << extra) & 0xFF, 0))

@@ -19,7 +19,7 @@ import sys
 import random
 import socket
 import logging
-import Zeroconf
+import zeroconf
 from BTL import stackthreading as threading
 from BTL.HostIP import get_deferred_host_ip, get_host_ip
 
@@ -31,7 +31,7 @@ server = None
 def _get_server():
     global server
     if not server:
-        server = Zeroconf.Zeroconf()
+        server = zeroconf.Zeroconf()
     return server
 
 class LocalDiscovery(object):
@@ -53,9 +53,9 @@ class LocalDiscovery(object):
         service_name = "%s._%s" % (peerid, infohash)
         service_type = "_bittorrent._tcp.local."
         
-        browser = Zeroconf.ServiceBrowser(self.server, service_type, self)
+        browser = zeroconf.ServiceBrowser(self.server, service_type, self)
 
-        service = Zeroconf.ServiceInfo(service_type,
+        service = zeroconf.ServiceInfo(service_type,
                                        "%s.%s" % (service_name, service_type),
                                        address = None, # to be filled in later
                                        port = self.port,
@@ -83,7 +83,7 @@ class LocalDiscovery(object):
         self.server.registerService(service)
 
     def unannounce(self, service):
-        assert isinstance(service, Zeroconf.ServiceInfo)
+        assert isinstance(service, zeroconf.ServiceInfo)
         if service.registered:
             service.registered = False
             service.browser.cancel()

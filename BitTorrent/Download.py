@@ -415,6 +415,7 @@ class Download(object):
         self.have = have
         # arg, slow
         count = 0
+        '''target is how many pieces peer has? '''
         target = len(self.have) - self.have.numfalse
         for i in xrange(len(self.have)):
             if count == target:

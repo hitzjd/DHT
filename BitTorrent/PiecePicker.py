@@ -63,6 +63,7 @@ class PieceBuckets(object):
             bucket[bucketpos] = tomove
             self.place_in_buckets[tomove] = (bucketindex, bucketpos)
         del bucket[-1]
+        '''if the last bucker becomes empty,delete it'''
         while len(self.buckets) > 0 and len(self.buckets[-1]) == 0:
             del self.buckets[-1]
         return bucketindex
