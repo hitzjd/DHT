@@ -153,11 +153,8 @@ class HTTPInitialConnection(GaurdedInitialConnection):
     
 
 class ConnectionManager(InternetSubscriber):
-
-    def __init__(self, make_upload, downloader, choker,
-                 numpieces, ratelimiter,
-                 rawserver, config, private, my_id, add_task, infohash, context,
-                 addcontactfunc, reported_port, tracker_ips, log_prefix ): 
+    def __init__(self, make_upload, downloader,
+                 numpieces,rawserver, config, my_id, add_task ):
         """
             @param downloader: MultiDownload for this torrent.
             @param my_id: my peer id.
@@ -171,24 +168,24 @@ class ConnectionManager(InternetSubscriber):
         """
         self.make_upload = make_upload
         self.downloader = downloader
-        self.choker = choker
+        # self.choker = choker
         # aaargh
         self.piece_size = downloader.storage.piece_size
         self.numpieces = numpieces
-        self.ratelimiter = ratelimiter
+        # self.ratelimiter = ratelimiter
         self.rawserver = rawserver
         self.my_id = my_id
-        self.private = private
+        # self.private = private
         self.config = config
         self.add_task = add_task
-        self.infohash = infohash
-        self.context = context
-        self.addcontact = addcontactfunc
-        self.reported_port = reported_port
+        # self.infohash = infohash
+        # self.context = context
+        # self.addcontact = addcontactfunc
+        # self.reported_port = reported_port
         self.everinc = False
-        self.tracker_ips = tracker_ips
-        self.log_prefix = log_prefix
-        self.logger = logging.getLogger(self.log_prefix)
+        # self.tracker_ips = tracker_ips
+        # self.log_prefix = log_prefix
+        # self.logger = logging.getLogger(self.log_prefix)
         self.closed = False        
 
         # submitted

@@ -105,6 +105,7 @@ class ConvertedMetainfo(object):
             except:
                 self.encoding = 'iso-8859-1'
                 self.bad_torrent_unsolvable = True
+        '''single file'''
         if info.has_key('length'):
             self.total_bytes = info['length']
             self.sizes.append(self.total_bytes)
@@ -113,6 +114,7 @@ class ConvertedMetainfo(object):
             else:
                 self.content_type = None  # hasattr or None.  Which is better?
         else:
+            '''multi files'''
             self.is_batch = True
             r = []
             self.orig_files = []

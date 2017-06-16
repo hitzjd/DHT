@@ -749,6 +749,7 @@ class StorageWrapper(object):
                 self.places[piece] = pos
                 self.rplaces[pos] = piece
 
+
     def _check_partial(self, pos, partials, data):
         index = None
         missing = False
