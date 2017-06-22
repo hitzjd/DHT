@@ -304,8 +304,9 @@ class CallbackConnection(object):
 
     '''called after tcp connection established'''
     def connectionMade(self):
+        print 'success to create Tcp connection'
         s = self.connection
-        '''call GaurdedInitialConnection::connection_made'''
+        '''call SingleportListener::connection_made'''
         s.handler.connection_made(s)
         self.optionalResetTimeout()
 
@@ -632,6 +633,7 @@ class RawServer(RawServerMixin):
         return s
 
     def create_serversocket(self, port, bind=''):
+        print 'create_serversocket(%s,%s)'%(bind,port)
         s = SocketRequestProxy(port, bind, 'tcp')
     
         factory = ConnectionFactory(self, outgoing=False)
@@ -742,6 +744,7 @@ class RawServer(RawServerMixin):
         factory.add_connection_data(c)
 
         if self.connection_limit:
+            print bindaddr
             connector = reactor.connectTCP(addr, port, factory,
                                            owner=id(context),
                                            bindAddress=bindaddr, timeout=timeout,
@@ -856,7 +859,6 @@ class RawServer(RawServerMixin):
         self.connections += 1
         
     def gethostbyname(self, name):
-        print "here"
         return self.reactor.resolve(name)
 
     def gethostbyaddr(self, addr):

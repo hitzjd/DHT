@@ -105,7 +105,7 @@ class StorageWrapper(object):
                  statusfunc, doneflag, data_flunked,
                  infohash, # needed for partials
                  is_batch, errorfunc, working_path, destination_path, resumefile,
-                 add_task, external_add_task):
+                 add_task, external_add_task, bitstring=None):
         assert len(hashes) > 0
         assert piece_size > 0
         self.initialized = False
@@ -137,7 +137,7 @@ class StorageWrapper(object):
         
         # a index => df dict for locking pieces
         self.blocking_pieces = {}
-        self.have = Bitfield(self.numpieces)
+        self.have = Bitfield(self.numpieces, bitstring)
         self.have_set = SparseSet()
         self.checked_pieces = SparseSet()
         self.fastresume = False

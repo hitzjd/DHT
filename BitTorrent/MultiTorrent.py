@@ -85,7 +85,7 @@ class MultiTorrent(Feedback):
 
     def __init__(self, config, rawserver,
                  data_dir, listen_fail_ok=False, init_torrents=True,
-                 is_single_torrent=False, resume_from_torrent_config=True):
+                 is_single_torrent=False, resume_from_torrent_config=True, bitstring=None):
         """
          @param config: program-wide configuration object.
          @param rawserver: object that manages main event loop and event
@@ -147,7 +147,8 @@ class MultiTorrent(Feedback):
         self.singleport_listener = SingleportListener(self.rawserver,
                                                       nattraverser,
                                                       self.log_root,
-                                                      config['use_local_discovery'])
+                                                      # config['use_local_discovery']
+                                                      False)
         self.choker = Choker(self.config, self.rawserver.add_task)
         self.up_ratelimiter = RateLimiter(self.rawserver.add_task)
         self.up_ratelimiter.set_parameters(config['max_upload_rate'],
@@ -165,6 +166,7 @@ class MultiTorrent(Feedback):
                                  self.rawserver.external_add_task,
                                  config['max_files_open'],
                                  config['num_disk_threads'])
+        self.bitstring = bitstring
 
         if self.resume_from_torrent_config:
             try:
@@ -215,6 +217,8 @@ class MultiTorrent(Feedback):
         for port in xrange(self.config['minport'], self.config['maxport'] + 1):
             try:
                 self.singleport_listener.open_port(port, self.config)
+                ''' ** create ukhashmir  **'''
+                '''
                 if self.config['start_trackerless_client']:
                     self.dht = UTKhashmir(self.config['bind'],
                                    self.singleport_listener.get_port(),
@@ -222,6 +226,7 @@ class MultiTorrent(Feedback):
                                    int(self.config['max_upload_rate'] * 0.01),
                                    rlcount=self.up_ratelimiter.increase_offset,
                                    config=self.config)
+                '''
                 break
             except socket.error, e:
                 exc_info = sys.exc_info()
@@ -338,7 +343,7 @@ class MultiTorrent(Feedback):
                     self.down_ratelimiter, self.total_downmeasure,
                     self.filepool, self.dht, self,
                     self.log_root, hidden=hidden,
-                    is_auto_update=is_auto_update)
+                    is_auto_update=is_auto_update, bitstring=self.bitstring)
         if feedback:
             t.add_feedback(feedback)
 
@@ -405,7 +410,7 @@ class MultiTorrent(Feedback):
         return df
 
 
-    def start_torrent(self, infohash):
+    def start_torrent(self, infohash, peerlist=None):
         if self.is_single_torrent and len(self.torrents) > 1:
             raise TooManyTorrents(_("MultiTorrent is set to download only "
                  "a single torrent, but tried to create more than one."))
@@ -419,7 +424,7 @@ class MultiTorrent(Feedback):
         t.logger.debug("starting torrent")
 
         self.running[infohash] = t
-        t.start_download()
+        t.start_download_with_peer_list(peerlist)
         t._dump_torrent_config()
         return t.state
 

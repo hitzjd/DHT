@@ -104,7 +104,7 @@ class Torrent(object):
                  singleport_listener, ratelimiter, down_ratelimiter,
                  total_downmeasure,
                  filepool, dht, feedback, log_root,
-                 hidden=False, is_auto_update=False):
+                 hidden=False, is_auto_update=False, bitstring=None):
         # The passed working path and destination_path should be filesystem
         # encoded or should be unicode if the filesystem supports unicode.
         fs_encoding = get_filesystem_encoding()
@@ -174,6 +174,7 @@ class Torrent(object):
         self.downtotal = 0
         self.downtotal_old = 0
         self.context_valid = True
+        self.bitstring = bitstring
 
     def _init(self):
         self._picker = None
@@ -475,7 +476,7 @@ class Torrent(object):
                                               self.destination_path,
                                               resumefile,
                                               self.add_task,
-                                              self.external_add_task)
+                                              self.external_add_task, self.bitstring)
 
         self._rm.set_storage(self._storagewrapper)
 
@@ -641,6 +642,36 @@ class Torrent(object):
         for url_prefix in self.metainfo.url_list:
             self._connection_manager.start_http_connection(url_prefix)
 
+        self.state = "running"
+        if not self.finflag.isSet():
+            self._activity = (_("downloading"), 0)
+
+        self.feedback.started(self)
+
+        if self._storagewrapper.amount_left == 0 and not self.completed:
+            # By default, self.finished() resets the policy to "auto",
+            # but if we discover on startup that we are already finished,
+            # we don't want to reset it.
+            # Also, if we discover on startup that we are already finished,
+            # don't set finished_this_session.
+            self.finished(policy=self.policy, finished_this_session=False)
+
+    def start_download_with_peer_list(self, peerlist=None):
+        assert self.state == "initialized", "state not initialized"
+
+        self.time_started = bttime()
+
+        self._down_ratelimiter.add_throttle_listener(self._connection_manager)
+        self._connection_manager.reopen(self.reported_port)
+
+        self._singleport_listener.add_torrent(self.infohash,
+                                              self._connection_manager)
+        self._listening = True
+        if peerlist:
+            for peer in peerlist:
+                self._connection_manager.start_connection(peer)
+
+        self._announced = True
         self.state = "running"
         if not self.finflag.isSet():
             self._activity = (_("downloading"), 0)

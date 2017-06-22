@@ -53,7 +53,7 @@ class LocalDiscovery(object):
         service_name = "%s._%s" % (peerid, infohash)
         service_type = "_bittorrent._tcp.local."
         
-        browser = zeroconf.ServiceBrowser(self.server, service_type, self)
+        browser = zeroconf.ServiceBrowser(self.server, service_type, None,self)
 
         service = zeroconf.ServiceInfo(service_type,
                                        "%s.%s" % (service_name, service_type),
